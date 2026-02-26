@@ -1,148 +1,34 @@
 # bkit-roo
 
-**Backend Kit for Roo** — Platform-independent core modules extracted from [Roo Code](https://github.com/RooCodeInc/Roo-Code) VS Code extension.
+**Backend Kit for Roo** — [Roo Code](https://github.com/RooCodeInc/Roo-Code) VS Code 확장에서 플랫폼 독립적인 핵심 모듈을 추출하는 프로젝트.
 
-Build AI coding agents for **any platform** — CLI, web servers, JetBrains plugins, Electron apps — using the same battle-tested core that powers Roo Code.
+Roo Code의 핵심 로직을 CLI, 웹 서버, JetBrains 플러그인, Electron 앱 등 **어디서든** 재사용할 수 있는 패키지로 분리하는 것이 목표입니다.
 
-## Packages
-
-| Package | Description |
-|---------|-------------|
-| `@bkit-roo/shared` | Shared types, platform abstraction interfaces, model constants |
-| `@bkit-roo/api-client` | Multi-provider LLM client (Anthropic, OpenAI, Gemini, OpenRouter, Ollama, 15+ more) |
-| `@bkit-roo/parser` | Assistant message XML parser + @-mention parser |
-| `@bkit-roo/prompts` | Dynamic system prompt generation engine |
-| `@bkit-roo/tools` | Tool definitions, group-based permissions, approval gate |
-| `@bkit-roo/modes` | Built-in modes (Code, Architect, Ask, Debug, Orchestrator) + custom modes |
-| `@bkit-roo/mcp-client` | Model Context Protocol (MCP) server hub |
-| `@bkit-roo/context` | Token budgeting, conversation condensation, message history |
-| `@bkit-roo/cost` | Token pricing and cost calculation |
-| `@bkit-roo/file-rules` | .rooignore / .rooprotected file rule system |
-| `@bkit-roo/core` | Integrated AgentRunner orchestrator |
-
-## Quick Start
-
-### Simple Chat
-
-```typescript
-import { buildApiHandler } from "@bkit-roo/api-client"
-
-const handler = buildApiHandler({
-  apiProvider: "anthropic",
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
-
-const stream = handler.createMessage(
-  "You are a helpful assistant.",
-  [{ role: "user", content: "Explain TypeScript generics in 3 sentences." }],
-)
-
-for await (const chunk of stream) {
-  if (chunk.type === "text") process.stdout.write(chunk.text)
-}
-```
-
-### Full AI Agent
-
-```typescript
-import { AgentRunner } from "@bkit-roo/core"
-import { AutoApprovalGate, InMemoryConfigStorage } from "@bkit-roo/shared"
-
-const agent = new AgentRunner({
-  apiConfig: { apiProvider: "anthropic", apiKey: "sk-..." },
-  fileSystem: myFileSystemImpl,    // implement IFileSystem
-  terminal: myTerminalImpl,         // implement ITerminalExecutor
-  approvalGate: new AutoApprovalGate(),
-  storage: new InMemoryConfigStorage(),
-  cwd: process.cwd(),
-  mode: "code",
-})
-
-const result = await agent.runTask("Create a hello world Express server")
-console.log(result.result) // completion message
-console.log(result.totalCost) // $ spent
-```
-
-## Architecture
-
-```
-┌──────────────────────────────────────────┐
-│           Your Application               │
-│  (CLI / Web / IDE Plugin / Electron)     │
-└─────────────────┬────────────────────────┘
-                  │
-                  ▼
-┌──────────────────────────────────────────┐
-│           @bkit-roo/core                 │
-│         AgentRunner                      │
-│   message → LLM → parse → tool → repeat │
-└──┬───┬───┬───┬───┬───┬───┬───┬───┬──────┘
-   │   │   │   │   │   │   │   │   │
-   ▼   ▼   ▼   ▼   ▼   ▼   ▼   ▼   ▼
- api- pars- prom- tool  mod- mcp- cont- cost file-
- cli- er   pts   s    es   cli-  ext       rul-
- ent                      ent              es
-```
-
-## Platform Abstraction
-
-bkit-roo has **zero dependency** on VS Code. All platform-specific operations are abstracted through interfaces:
-
-| Interface | What it replaces |
-|-----------|-----------------|
-| `IFileSystem` | `vscode.workspace.fs` |
-| `ITerminalExecutor` | `vscode.window.createTerminal` |
-| `IApprovalGate` | VS Code webview approval dialogs |
-| `IConfigStorage` | `vscode.ExtensionContext.globalState` |
-| `ISecretStorage` | `vscode.SecretStorage` |
-| `ILogger` | `vscode.OutputChannel` |
-
-Provide your own implementations, or use the built-in defaults:
-- `AutoApprovalGate` — always approves (for non-interactive use)
-- `InMemoryConfigStorage` / `InMemorySecretStorage` — ephemeral storage
-- `ConsoleLogger` / `NullLogger` — stdout or silent logging
-
-## Development
-
-```bash
-# Install dependencies
-pnpm install
-
-# Build all packages
-pnpm build
-
-# Run tests
-pnpm test
-
-# Type check
-pnpm typecheck
-
-# Verify no VS Code imports
-pnpm check-vscode
-```
+> 현재는 **프로젝트 설계 및 AI 어시스턴트 설정 단계**이며, 실제 패키지 구현은 이 설정을 기반으로 진행됩니다.
 
 ## Roo Code AI 어시스턴트 설정
 
-이 프로젝트에는 VS Code [Roo Code](https://github.com/RooCodeInc/Roo-Code) 확장을 위한 AI 어시스턴트 설정이 포함되어 있습니다. Roo Code가 프로젝트 구조, 코딩 표준, 워크플로를 자동으로 이해하고 적절한 도움을 제공합니다.
+이 프로젝트는 VS Code [Roo Code](https://github.com/RooCodeInc/Roo-Code) 확장의 AI 어시스턴트 설정을 포함하고 있습니다. Roo Code가 프로젝트 구조, 코딩 표준, 워크플로를 자동으로 이해하고 PDCA 사이클에 따라 개발을 도와줍니다.
 
 ### 적용 방법
 
 1. **VS Code에 Roo Code 설치**
    - VS Code 마켓플레이스에서 [Roo Code](https://marketplace.visualstudio.com/items?itemName=RooVeterinaryInc.roo-cline) 검색 후 설치
-   - 또는 터미널에서: `code --install-extension RooVeterinaryInc.roo-cline`
+   - 또는: `code --install-extension RooVeterinaryInc.roo-cline`
 
 2. **프로젝트 열기**
-   - VS Code에서 이 프로젝트 루트(`bkit-roo/`)를 연다
-   - Roo Code가 `.roomodes`, `.roo/`, `.rooignore`를 **자동으로 인식**한다 (별도 설정 불필요)
+   - VS Code에서 이 프로젝트 루트(`bkit-roo/`)를 열면
+   - Roo Code가 `.roomodes`, `.roo/`, `.rooignore`를 **자동으로 인식** (별도 설정 불필요)
 
 3. **모드 전환**
-   - Roo Code 패널에서 모드 선택 드롭다운을 클릭하면 커스텀 모드가 표시된다
+   - Roo Code 패널에서 모드 선택 드롭다운을 클릭하면 커스텀 모드가 표시됨
 
-### 설정 파일 구조
+### 파일 구조
 
 ```
-.roomodes                            # 커스텀 모드 정의 (YAML)
+.roomodes                            # 커스텀 모드 정의
 .rooignore                           # AI 컨텍스트 제외 패턴
+.gitignore                           # Git 제외 패턴
 
 .roo/
 ├── rules/                           # 모든 모드에 적용되는 공통 규칙
@@ -171,30 +57,41 @@ pnpm check-vscode
     └── migrate-module/SKILL.md      #   이식 전용 상세 가이드
 ```
 
+### PDCA 사이클
+
+모드와 스킬이 PDCA 사이클을 따르도록 설계되어 있습니다:
+
+| 단계 | 모드/스킬 | 역할 |
+|------|----------|------|
+| **Plan** | Architect 모드 + `rules-architect/` | 패키지 계층 설계, 의존성 방향 결정 |
+| **Do** | Code / Migrator 모드 + `new-package`, `migrate-module` 스킬 | 구현, 코드 이식 |
+| **Check** | Tester 모드 + `verify-build` 스킬 | build → typecheck → check-vscode → test |
+| **Act** | 검증 결과 기반 피드백 반영 → 다시 Plan으로 | 수정 및 개선 순환 |
+
 ### 커스텀 모드
 
 | 모드 | 용도 | 파일 권한 |
 |------|------|----------|
-| **Migrator** | `reference/roo-code/src/`에서 bkit-roo로 코드 이식 | `packages/**/*.ts`, `*.json` 편집 가능 |
+| **Migrator** | Roo Code 원본에서 bkit-roo로 코드 이식 | `packages/**/*.ts`, `*.json` 편집 가능 |
 | **Tester** | 테스트 작성 및 실행 | `*.test.ts`, `__tests__/` 편집 가능 |
 | **Documenter** | TSDoc, README, 가이드 작성 | `*.md`, `*.ts` 편집 가능 |
 
-기본 제공 모드(Code, Architect, Ask, Debug)도 프로젝트 규칙이 자동 적용됩니다.
+기본 제공 모드(Code, Architect, Ask, Debug)에도 프로젝트 규칙이 자동 적용됩니다.
 
 ### 스킬 사용법
 
-Roo Code 채팅에서 관련 작업을 요청하면 스킬이 자동으로 활성화됩니다:
+Roo Code 채팅에서 관련 작업을 요청하면 스킬이 자동 활성화됩니다:
 
-- **"새 패키지 만들어줘"** → `new-package` 스킬: 패키지 스캐폴딩 자동 생성
-- **"원본 코드 이식해줘"** → `migrate-module` 스킬: VS Code 의존성 제거 가이드 제공
-- **"빌드 검증해줘"** → `verify-build` 스킬: build → typecheck → check-vscode → test 순서 실행
+- **"새 패키지 만들어줘"** → `new-package` 스킬
+- **"원본 코드 이식해줘"** → `migrate-module` 스킬
+- **"빌드 검증해줘"** → `verify-build` 스킬
 
 ### 규칙 동작 방식
 
-- `.roo/rules/` 파일들은 **모든 모드**에서 시스템 프롬프트에 자동 추가된다
-- `.roo/rules-{mode}/` 파일들은 **해당 모드에서만** 추가된다
-- 파일명의 숫자 접두사(`01-`, `02-`, `03-`)가 로딩 순서를 결정한다
-- `.rooignore`에 지정된 경로는 AI가 읽지 않는다 (`dist/`, `node_modules/` 등)
+- `.roo/rules/` — **모든 모드**에서 시스템 프롬프트에 자동 추가
+- `.roo/rules-{mode}/` — **해당 모드에서만** 추가
+- 파일명의 숫자 접두사(`01-`, `02-`, `03-`)가 로딩 순서를 결정
+- `.rooignore`에 지정된 경로는 AI가 읽지 않음 (`dist/`, `node_modules/` 등)
 
 ### 커스터마이징
 
@@ -213,7 +110,7 @@ mkdir -p .roo/skills/my-skill
 cat > .roo/skills/my-skill/SKILL.md << 'EOF'
 ---
 name: my-skill
-description: 스킬 설명 (AI가 이 설명을 보고 스킬을 선택한다)
+description: 스킬 설명
 ---
 
 # 스킬 지침
@@ -221,20 +118,6 @@ description: 스킬 설명 (AI가 이 설명을 보고 스킬을 선택한다)
 1. 단계 1
 2. 단계 2
 EOF
-```
-
-**새 커스텀 모드 추가** (`.roomodes` 편집):
-```yaml
-customModes:
-  - slug: my-mode
-    name: My Mode
-    description: 모드 설명
-    roleDefinition: AI에게 부여할 역할 정의
-    groups:
-      - read              # 읽기 도구 전체 허용
-      - - edit             # 편집 도구를 fileRegex로 제한
-        - fileRegex: "\\.ts$"
-      - command            # 명령어 실행 허용
 ```
 
 ## License
