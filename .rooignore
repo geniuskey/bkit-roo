@@ -1,0 +1,18 @@
+# 빌드 출력
+**/dist/
+**/node_modules/
+
+# Git
+.git/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 캐시
+.turbo/
+*.tsbuildinfo
