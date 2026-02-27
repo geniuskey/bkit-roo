@@ -14,18 +14,54 @@ VS Code 마켓플레이스에서 [Roo Code](https://marketplace.visualstudio.com
 code --install-extension RooVeterinaryInc.roo-cline
 ```
 
-### 2. 설정 파일 복사
+### 2. 적용 방식 선택
 
-이 레포의 설정 파일을 자신의 프로젝트 루트에 복사합니다.
+설정을 **글로벌** (모든 프로젝트에 적용) 또는 **프로젝트별** (특정 프로젝트에만 적용)로 적용할 수 있습니다. 두 방식을 함께 사용하면 글로벌 규칙이 먼저 로드되고, 프로젝트 규칙이 추가/우선 적용됩니다.
+
+#### 방법 A: 글로벌 적용 (모든 프로젝트 공통)
 
 ```bash
-# 이 레포를 클론
+git clone https://github.com/geniuskey/bkit-roo.git
+
+# 글로벌 규칙 복사 (모든 프로젝트에 자동 적용)
+cp -r bkit-roo/.roo/rules/          ~/.roo/rules/
+cp -r bkit-roo/.roo/rules-code/     ~/.roo/rules-code/
+cp -r bkit-roo/.roo/rules-architect/ ~/.roo/rules-architect/
+cp -r bkit-roo/.roo/rules-reviewer/ ~/.roo/rules-reviewer/
+cp -r bkit-roo/.roo/rules-tester/   ~/.roo/rules-tester/
+cp -r bkit-roo/.roo/rules-documenter/ ~/.roo/rules-documenter/
+```
+
+글로벌 커스텀 모드는 Roo Code UI에서 설정합니다:
+
+1. Roo Code 패널 상단의 모드 선택 드롭다운 클릭
+2. **"Edit Global Modes"** 선택 → `custom_modes.yaml` 파일이 열림
+3. 이 레포의 `.roomodes` 내용을 붙여넣기
+
+> **참고**: 글로벌 규칙은 `~/.roo/rules/`에, 모드별 규칙은 `~/.roo/rules-{mode}/`에 저장됩니다. Windows는 `%USERPROFILE%\.roo\`를 사용합니다.
+
+#### 방법 B: 프로젝트별 적용 (특정 프로젝트에만)
+
+```bash
 git clone https://github.com/geniuskey/bkit-roo.git
 
 # 자기 프로젝트로 설정 파일 복사
 cp -r bkit-roo/.roo       /path/to/your-project/
 cp    bkit-roo/.roomodes   /path/to/your-project/
 cp    bkit-roo/.rooignore  /path/to/your-project/
+```
+
+#### 방법 A+B: 글로벌 + 프로젝트별 함께 사용
+
+글로벌에는 공통 규칙(코딩 표준, 리뷰 기준 등)을, 프로젝트에는 프로젝트 고유 규칙(프로젝트 구조, 빌드 명령어 등)을 배치합니다. 같은 파일명이 충돌하면 **프로젝트 규칙이 우선**합니다.
+
+```bash
+# 글로벌: 모든 프로젝트 공통 코딩 표준
+~/.roo/rules/03-coding-standards.md
+
+# 프로젝트: 이 프로젝트만의 구조/워크플로
+/path/to/project/.roo/rules/01-project-overview.md
+/path/to/project/.roo/rules/02-development-workflow.md
 ```
 
 ### 3. 프로젝트에 맞게 수정
@@ -108,9 +144,15 @@ VS Code로 프로젝트를 열면 Roo Code가 `.roomodes`, `.roo/`, `.rooignore`
 
 규칙은 AI에게 **프로젝트 맥락을 주입**하는 마크다운 파일입니다.
 
-- `.roo/rules/` — **모든 모드**에 적용 (프로젝트 구조, 워크플로, 코딩 표준)
-- `.roo/rules-{mode}/` — **해당 모드에서만** 적용
-- 파일명 접두사(`01-`, `02-`, `03-`)로 **로딩 순서** 결정
+**글로벌 규칙** (모든 프로젝트에 적용):
+- `~/.roo/rules/` — 모든 프로젝트, 모든 모드에 적용
+- `~/.roo/rules-{mode}/` — 모든 프로젝트, 해당 모드에서만 적용
+
+**프로젝트 규칙** (해당 프로젝트에만 적용):
+- `.roo/rules/` — 해당 프로젝트, 모든 모드에 적용
+- `.roo/rules-{mode}/` — 해당 프로젝트, 해당 모드에서만 적용
+
+로딩 순서: **글로벌 → 프로젝트** (충돌 시 프로젝트 우선). 파일명 접두사(`01-`, `02-`)로 순서 결정.
 
 ### 스킬 (Skills)
 
