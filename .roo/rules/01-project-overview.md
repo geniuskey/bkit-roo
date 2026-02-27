@@ -1,36 +1,45 @@
-# bkit-roo 프로젝트 개요
+# 프로젝트 개요
+
+<!-- TODO: 이 파일을 자기 프로젝트에 맞게 전체 재작성하세요.
+     AI가 프로젝트를 이해하는 데 가장 중요한 파일입니다. -->
 
 ## 프로젝트 정의
 
-bkit-roo (Backend Kit for Roo)는 Roo Code VS Code 확장의 핵심 AI 에이전트 로직을 VS Code 의존성 없이 사용할 수 있도록 추출한 모듈러 TypeScript 모노레포이다.
+<!-- 프로젝트 이름, 목적, 대상 사용자를 1~2문장으로 작성 -->
+
+(프로젝트 이름)은/는 (목적)을/를 위한 (유형: 웹 앱 / CLI / 라이브러리 / API 서버 등)이다.
 
 ## 핵심 원칙
 
-1. **VS Code 독립성**: 어떤 패키지에서도 `vscode` 모듈을 import하면 안 된다. `pnpm check-vscode`로 항상 검증한다.
-2. **플랫폼 추상화**: VS Code API 대신 `@bkit-roo/shared`의 인터페이스(IFileSystem, ITerminalExecutor, IApprovalGate 등)를 사용한다.
-3. **의존성 방향**: 모든 패키지는 shared에 의존하고, 순환 의존은 허용하지 않는다.
-4. **단일 진입점**: 각 패키지는 `src/index.ts`에서만 public API를 export한다.
+<!-- AI가 코드를 작성하거나 리뷰할 때 반드시 지켜야 할 기술적 원칙 -->
 
-## 모노레포 구조
+1. **(원칙 이름)**: 설명 (예: "모든 API 응답은 일관된 JSON 형식을 따른다")
+2. **(원칙 이름)**: 설명 (예: "외부 의존성을 최소화한다")
+3. **(원칙 이름)**: 설명 (예: "모든 public 함수에 단위 테스트를 작성한다")
+
+## 프로젝트 구조
+
+<!-- 실제 디렉터리 구조로 교체. AI가 파일 위치를 파악하는 데 사용 -->
 
 ```
-packages/
-  shared/       # 기본 타입, 인터페이스, 상수
-  cost/         # 토큰 가격 및 비용 계산
-  file-rules/   # .rooignore/.rooprotected 파싱
-  parser/       # XML 메시지 파서, 멘션 파서
-  tools/        # 도구 정의, 스키마, 승인 게이트
-  modes/        # 빌트인 모드 + 커스텀 모드 관리
-  api-client/   # 멀티 프로바이더 LLM 클라이언트
-  prompts/      # 동적 시스템 프롬프트 생성
-  mcp-client/   # MCP 서버 연결 허브
-  context/      # 토큰 예산, 컨텍스트 압축
-  core/         # 통합 AgentRunner 오케스트레이터
-examples/
-  simple-chat/  # 최소 LLM 채팅 예제
-  cli-agent/    # 전체 AI 에이전트 CLI 예제
+src/
+  ├── index.ts              # 진입점
+  ├── config/               # 설정
+  ├── routes/               # API 라우트 (해당 시)
+  ├── services/             # 비즈니스 로직
+  ├── models/               # 데이터 모델
+  ├── utils/                # 유틸리티
+  └── __tests__/            # 테스트
 ```
 
-## 원본 참조
+## 주요 기술 스택
 
-Roo Code 원본 소스는 `reference/roo-code/src/`에 있다. 이식 작업 시 반드시 원본과 비교한다.
+<!-- AI가 코드 생성 시 올바른 도구/문법을 사용하도록 명시 -->
+
+- Language: TypeScript
+- Runtime: Node.js
+- Framework: (Express / Next.js / Fastify 등)
+- Build: (tsup / tsc / webpack / vite 등)
+- Test: (Vitest / Jest / Mocha 등)
+- Lint: ESLint
+- Format: Prettier

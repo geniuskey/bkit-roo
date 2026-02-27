@@ -30,7 +30,27 @@ cp    bkit-roo/.rooignore  /path/to/your-project/
 
 ### 3. 프로젝트에 맞게 수정
 
-복사한 파일을 자기 프로젝트에 맞게 수정합니다. 아래 [커스터마이징 가이드](#커스터마이징-가이드)를 참고하세요.
+각 파일에 `<!-- TODO: ... -->` 마커가 있습니다. 이 부분을 자기 프로젝트에 맞게 수정하세요.
+
+**필수 수정** (이 3개를 수정하면 AI가 프로젝트를 이해합니다):
+
+| 파일 | 수정 내용 |
+|------|----------|
+| `rules/01-project-overview.md` | 프로젝트 설명, 구조, 기술 스택 |
+| `rules/02-development-workflow.md` | 빌드/테스트/배포 명령어 |
+| `rules/03-coding-standards.md` | 코딩 컨벤션, 네이밍 규칙 |
+
+**선택 수정** (필요에 따라):
+
+| 파일 | 설명 |
+|------|------|
+| `.roomodes` | 커스텀 모드의 역할/권한 조정 |
+| `rules-code/*` | Code 모드 구현 규칙 |
+| `rules-architect/*` | Architect 모드 설계 규칙 |
+| `rules-reviewer/*` | Reviewer 모드 리뷰 기준 |
+| `rules-tester/*` | Tester 모드 테스트 규칙 |
+| `rules-documenter/*` | Documenter 모드 문서화 규칙 |
+| `skills/*` | 스킬 절차의 명령어/구조 |
 
 ### 4. VS Code에서 프로젝트 열기
 
@@ -45,7 +65,7 @@ VS Code로 프로젝트를 열면 Roo Code가 `.roomodes`, `.roo/`, `.rooignore`
 
 .roo/
 ├── rules/                           # 모든 모드 공통 규칙
-│   ├── 01-project-overview.md       #   프로젝트 구조, 핵심 원칙
+│   ├── 01-project-overview.md       #   프로젝트 구조, 기술 스택
 │   ├── 02-development-workflow.md   #   빌드/테스트 명령어
 │   └── 03-coding-standards.md       #   코딩 컨벤션, 네이밍 규칙
 │
@@ -55,19 +75,19 @@ VS Code로 프로젝트를 열면 Roo Code가 `.roomodes`, `.roo/`, `.rooignore`
 ├── rules-architect/                 # Architect 모드 전용 규칙
 │   └── 01-architecture-rules.md
 │
-├── rules-migrator/                  # Migrator 모드 전용 규칙
-│   └── 01-migration-rules.md
+├── rules-reviewer/                  # Reviewer 모드 전용 규칙 (커스텀)
+│   └── 01-review-rules.md
 │
-├── rules-tester/                    # Tester 모드 전용 규칙
+├── rules-tester/                    # Tester 모드 전용 규칙 (커스텀)
 │   └── 01-testing-rules.md
 │
-├── skills/                          # 모든 모드에서 사용 가능한 스킬
-│   ├── new-package/SKILL.md         #   새 패키지 스캐폴딩
-│   ├── migrate-module/SKILL.md      #   코드 이식 절차
-│   └── verify-build/SKILL.md        #   빌드 검증 파이프라인
+├── rules-documenter/                # Documenter 모드 전용 규칙 (커스텀)
+│   └── 01-documentation-rules.md
 │
-└── skills-migrator/                 # Migrator 모드 전용 스킬
-    └── migrate-module/SKILL.md
+└── skills/                          # 모든 모드에서 사용 가능한 스킬
+    ├── verify-build/SKILL.md        #   빌드 검증 파이프라인
+    ├── scaffold-module/SKILL.md     #   새 모듈 스캐폴딩
+    └── code-review/SKILL.md         #   코드 리뷰 체크리스트
 ```
 
 ## Roo Code 핵심 개념
@@ -80,9 +100,9 @@ VS Code로 프로젝트를 열면 Roo Code가 `.roomodes`, `.roo/`, `.rooignore`
 
 | 모드 | 용도 | 파일 권한 |
 |------|------|----------|
-| **Migrator** | 외부 코드베이스에서 코드 이식 | 특정 디렉터리의 `*.ts`, `*.json` 편집 |
-| **Tester** | 테스트 작성 및 실행 | `*.test.ts`, `__tests__/` 편집 |
-| **Documenter** | 문서 작성 | `*.md`, `*.ts` 편집 |
+| **Reviewer** | 코드 리뷰 및 품질 검사 | 읽기 전용 (코드 수정 불가) |
+| **Tester** | 테스트 작성 및 실행 | `*.test.*`, `*.spec.*`, `__tests__/` 편집 |
+| **Documenter** | 문서 작성 | `*.md`, `*.ts`, `*.js` 등 편집 |
 
 ### 규칙 (Rules)
 
@@ -105,36 +125,6 @@ VS Code로 프로젝트를 열면 Roo Code가 `.roomodes`, `.roo/`, `.rooignore`
 AI가 **읽지 않을 경로**를 지정합니다. `.gitignore`와 동일한 패턴 문법을 사용합니다.
 
 ## 커스터마이징 가이드
-
-이 템플릿의 파일들은 TypeScript 모노레포(pnpm + Turborepo + tsup + Vitest) 프로젝트를 기준으로 작성되어 있습니다. 자신의 프로젝트에 맞게 수정하세요.
-
-### 그대로 사용 가능
-
-| 파일 | 설명 |
-|------|------|
-| `.rooignore` | `dist/`, `node_modules/` 등 일반적인 제외 패턴 |
-
-### 구조는 유지하고 내용만 수정
-
-| 파일 | 수정 포인트 |
-|------|------------|
-| `rules/02-development-workflow.md` | 빌드/테스트 명령어를 자기 프로젝트 것으로 교체 |
-| `rules/03-coding-standards.md` | 패키지 스코프명, 의존성 그래프, 네이밍 규칙 수정 |
-| `rules-architect/01-architecture-rules.md` | 아키텍처 원칙 유지, 패키지 계층/문서 경로 수정 |
-| `rules-tester/01-testing-rules.md` | Vitest 패턴 유지, 인터페이스명/패키지 스코프 수정 |
-| `skills/new-package/SKILL.md` | 패키지 스코프명, 기본 의존성, 라이선스 수정 |
-| `skills/verify-build/SKILL.md` | 검증 파이프라인 단계를 자기 프로젝트에 맞게 수정 |
-
-### 프로젝트에 맞게 새로 작성
-
-| 파일 | 이유 |
-|------|------|
-| `.roomodes` | 커스텀 모드의 역할, 권한이 프로젝트마다 다름 |
-| `rules/01-project-overview.md` | 프로젝트 설명, 구조, 핵심 원칙이 완전히 다름 |
-| `rules-code/01-implementation-rules.md` | 구현 규칙이 프로젝트마다 다름 |
-| `rules-migrator/01-migration-rules.md` | 이식 대상/방법이 프로젝트마다 다름 |
-| `skills/migrate-module/SKILL.md` | 이식 절차가 프로젝트마다 다름 |
-| `skills-migrator/migrate-module/SKILL.md` | 위와 동일 |
 
 ### 새 규칙 추가
 
@@ -165,23 +155,30 @@ EOF
 
 ### 새 커스텀 모드 추가
 
-`.roomodes` 파일을 편집합니다:
+`.roomodes` 파일에 새 모드를 추가합니다:
 
-```json
-{
-  "customModes": [
-    {
-      "slug": "my-mode",
-      "name": "My Mode",
-      "roleDefinition": "AI에게 부여할 역할 정의",
-      "groups": [
-        "read",
-        ["edit", { "fileRegex": "\\.ts$" }],
-        "command"
-      ]
-    }
-  ]
-}
+```yaml
+customModes:
+  # ... 기존 모드 ...
+  - slug: my-mode
+    name: My Mode
+    description: 모드 설명
+    roleDefinition: AI에게 부여할 역할 정의
+    whenToUse: 이 모드를 사용할 상황
+    groups:
+      - read
+      - - edit
+        - fileRegex: "\\.ts$"
+      - command
+```
+
+### 모드별 전용 스킬 추가
+
+특정 모드에서만 사용할 스킬은 `skills-{mode}/` 디렉터리에 배치합니다:
+
+```bash
+mkdir -p .roo/skills-tester/generate-fixtures
+# .roo/skills-tester/generate-fixtures/SKILL.md 작성
 ```
 
 ## 참고 자료
