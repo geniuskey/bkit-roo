@@ -1,56 +1,51 @@
 # 코딩 표준
 
+<!-- TODO: 자기 프로젝트의 코딩 컨벤션에 맞게 수정하세요.
+     아래는 일반적인 TypeScript 프로젝트 기준입니다. -->
+
 ## TypeScript 설정
 
-- Target: ES2022
-- Module: ESNext
 - Strict 모드 활성화
-- 120자 줄 길이 제한 (Prettier)
-- 탭 대신 스페이스 (2칸 들여쓰기)
-- 세미콜론 없음 (Prettier 설정)
-
-## 패키지 구조 규칙
-
-각 패키지는 반드시 다음 구조를 따른다:
-```
-packages/<name>/
-  ├── package.json          # @bkit-roo/<name> 네이밍
-  ├── tsconfig.json         # tsconfig.base.json 상속
-  ├── tsup.config.ts        # ESM + CJS 빌드 설정
-  ├── src/
-  │   ├── index.ts          # 단일 public export 진입점
-  │   ├── __tests__/        # Vitest 테스트 파일
-  │   └── ...               # 구현 파일
-  └── dist/                 # 빌드 출력 (git 무시)
-```
-
-## Import 규칙
-
-- 패키지 간 import는 패키지명으로: `import { ... } from "@bkit-roo/shared"`
-- 패키지 내부 import는 상대 경로로: `import { ... } from "./utils"`
-- `vscode` 모듈 import 절대 금지
-- Node.js 내장 모듈은 허용 (fs, path, os 등)
-
-## 의존성 방향 (순환 금지)
-
-```
-shared (기반)
-  ├── cost
-  ├── file-rules
-  ├── parser
-  ├── tools
-  │     └── modes
-  ├── api-client (← cost)
-  ├── prompts (← tools, modes)
-  ├── mcp-client (← tools)
-  ├── context (← api-client, cost)
-  └── core (← 모든 패키지)
-```
+- 줄 길이 제한: 100자 (Prettier)
+- 들여쓰기: 스페이스 2칸
+- 세미콜론: 사용 (Prettier 설정에 따라 변경)
 
 ## 네이밍 규칙
 
-- 파일명: camelCase (예: `tokenBudget.ts`)
-- 클래스/인터페이스: PascalCase (예: `AgentRunner`, `IFileSystem`)
-- 함수/변수: camelCase (예: `calculateCost`, `buildApiHandler`)
-- 상수: UPPER_SNAKE_CASE (예: `MAX_TOKENS`, `DEFAULT_MODEL_ID`)
-- 인터페이스 접두사: `I` (예: `IFileSystem`, `IApprovalGate`)
+| 대상 | 규칙 | 예시 |
+|------|------|------|
+| 파일명 | camelCase 또는 kebab-case | `userService.ts`, `user-service.ts` |
+| 클래스/인터페이스 | PascalCase | `UserService`, `IUserRepository` |
+| 함수/변수 | camelCase | `getUser`, `isActive` |
+| 상수 | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT`, `API_BASE_URL` |
+| 타입 파라미터 | 대문자 한 글자 또는 PascalCase | `T`, `TResult` |
+
+## Import 규칙
+
+- 외부 패키지 → 내부 모듈 → 상대 경로 순서로 정렬
+- 타입 전용 import는 `import type { ... }`을 사용
+- 순환 import 금지
+
+```typescript
+// 1. 외부 패키지
+import express from "express"
+import type { Request, Response } from "express"
+
+// 2. 내부 모듈 (절대 경로 또는 별칭)
+import { UserService } from "@/services/userService"
+
+// 3. 상대 경로
+import { validate } from "./utils"
+```
+
+## 에러 처리
+
+- 예상 가능한 에러는 명시적으로 처리한다
+- `any` 타입 catch는 지양하고, 타입 가드를 사용한다
+- 비즈니스 로직 에러는 커스텀 에러 클래스를 사용한다
+
+## 주석 규칙
+
+- "무엇을 하는가"가 아니라 "왜 그렇게 하는가"를 주석으로 남긴다
+- 자명한 코드에는 주석을 달지 않는다
+- TODO/FIXME/HACK 주석에는 담당자 또는 이슈 번호를 함께 기록한다

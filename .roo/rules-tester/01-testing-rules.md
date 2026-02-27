@@ -1,62 +1,62 @@
 # Tester 모드 규칙
 
+<!-- TODO: 프로젝트의 테스트 프레임워크와 패턴에 맞게 수정하세요. -->
+
 ## 테스트 프레임워크
 
-- **Vitest** 사용 (Jest 호환 API)
-- 테스트 파일: `packages/<name>/src/__tests__/*.test.ts`
-- 설정 파일: 각 패키지의 `vitest.config.ts` 또는 루트 설정 상속
+<!-- 사용하는 테스트 프레임워크로 교체 -->
+
+- 프레임워크: Vitest (또는 Jest, Mocha 등)
+- 테스트 파일 위치: `src/__tests__/*.test.ts` 또는 `*.spec.ts`
+- 설정 파일: `vitest.config.ts` (또는 `jest.config.ts`)
 
 ## 테스트 작성 패턴
 
-```typescript
-import { describe, it, expect, vi } from "vitest"
+Arrange-Act-Assert (AAA) 패턴을 따른다:
 
-describe("모듈명", () => {
-  it("기능 설명", () => {
-    // Arrange
-    // Act
-    // Assert
+```typescript
+import { describe, it, expect } from "vitest"
+
+describe("UserService", () => {
+  it("should return user by ID when user exists", () => {
+    // Arrange — 테스트 데이터와 의존성 준비
+    const mockRepo = { findById: vi.fn().mockResolvedValue({ id: 1, name: "Alice" }) }
+    const service = new UserService(mockRepo)
+
+    // Act — 테스트 대상 실행
+    const result = await service.getUser(1)
+
+    // Assert — 결과 검증
+    expect(result).toEqual({ id: 1, name: "Alice" })
+    expect(mockRepo.findById).toHaveBeenCalledWith(1)
   })
 })
 ```
 
+## 테스트 네이밍
+
+테스트 이름은 **행동**을 설명한다:
+
+- `"should return empty array when no items found"`
+- `"should throw ValidationError when email is invalid"`
+- `"should call notification service after order is placed"`
+
 ## 모킹 전략
 
-### LLM API 응답 모킹
-```typescript
-const mockStream = async function* () {
-  yield { type: "text" as const, text: "Hello" }
-  yield { type: "usage" as const, inputTokens: 10, outputTokens: 5 }
-}
-```
+- 외부 서비스(DB, API, 파일 시스템)는 모킹한다
+- 내부 유틸리티 함수는 가급적 실제 구현을 사용한다
+- 모킹은 테스트 격리가 필요할 때만 사용한다
 
-### 파일 시스템 모킹
-```typescript
-const mockFs: IFileSystem = {
-  readFile: vi.fn().mockResolvedValue("file content"),
-  writeFile: vi.fn().mockResolvedValue(undefined),
-  exists: vi.fn().mockResolvedValue(true),
-  // ...
-}
-```
+## 커버리지 가이드라인
 
-### 터미널 실행기 모킹
-```typescript
-const mockTerminal: ITerminalExecutor = {
-  execute: vi.fn().mockResolvedValue({ exitCode: 0, output: "success" }),
-}
-```
-
-## 현재 테스트 우선순위
-
-1. **T-064**: `@bkit-roo/api-client` - 프로바이더별 단위 테스트 (SDK 의존성 모킹 필요)
-2. **T-109**: `@bkit-roo/mcp-client` - 모의 MCP 서버 통합 테스트
-3. **T-127**: `@bkit-roo/core` - AgentRunner 전체 파이프라인 통합 테스트
+- 핵심 비즈니스 로직: 높은 커버리지 목표
+- 유틸리티 함수: 엣지 케이스 포함
+- 에러 경로: 반드시 테스트
 
 ## 실행 명령어
 
 ```bash
-pnpm test                                    # 전체 테스트
-pnpm --filter @bkit-roo/<name> test          # 특정 패키지 테스트
-pnpm --filter @bkit-roo/<name> test -- --watch  # 감시 모드
+npm test                      # 전체 테스트
+npm test -- --watch           # 감시 모드
+npm test -- --coverage        # 커버리지 리포트
 ```
